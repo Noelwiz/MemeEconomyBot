@@ -1,82 +1,63 @@
 package economy;
 
-import economy.Portfolio.PortfolioLinkedList.FolioNode;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
+
+
 
 public class Portfolio {
-	public PortfolioLinkedList MemeList;
+	//TODO: implement the old functionality with new linked lists
+	public ArrayList<FolioNode> MemeList = new ArrayList<FolioNode>();
+	
 	public int InterestPerRound = 0;
 	public int value = 0;
 	public int Size = 0;
 	
-	public class PortfolioLinkedList{
-		FolioNode head = null;
+	
+	public class FolioNode{
+		Meme data;
+		int owned;
 		
-		public PortfolioLinkedList(MemeLinkedList memell) {
-			Meme[] memes= memell.toArray();
-			for(int i=0; i < memes.length;i++) {				
-				addMeme(memes[i]);
-			}
-			
-		}
+		public FolioNode(Meme m) {
+			data = m;
+			owned = 0;
+		}	
+	}
+	
+	public void addMeme(Meme m) {
+		MemeList.add(new FolioNode(m));	
+	}		
 		
-		public class FolioNode{
-			Meme data;
-			int owned;
-			FolioNode next = null;
-			
-			public FolioNode(Meme m) {
-				data = m;
-				owned = 0;
-			}
-			
-			public FolioNode(Meme m, FolioNode n) {
-				data = m;
-				owned = 0;
-				next = n;
-			}
-			
-		}
-		
-		public void addMeme(Meme m) {
-			if (head!= null) {
-				FolioNode current = head;
-				while(current.next != null) {
-					current = current.next;
-				}
-				current.next = new FolioNode(m);
-				Size++;
-			}
-			else {
-				head = new FolioNode(m);
-				Size++;
+
+	public FolioNode search(Meme m) {
+		FolioNode current;
+		ListIterator<FolioNode> iter = MemeList.listIterator();
+		while (iter.hasNext()) {
+			current = iter.next();
+			if (current.data == m) {
+				return current;
 			}
 		}
-		
-		public FolioNode search(Meme m) {
-			FolioNode current = head;
-			while (current != null) {
-				if (current.data == m) {
-					return current;
-				}
-				current = current.next;
-			}
-			System.out.println("failed to find a meme in a user's portfolio");
-			return null;
-		}
-		
-		
-		
-	}	
+		System.out.println("failed to find a meme in a user's portfolio");
+		return null;
+	}
 	
 	//constructor
-	public Portfolio(MemeLinkedList market) {
-		MemeList = new PortfolioLinkedList(market);
+	//makes a porfolio and adds every meme to the list
+	public Portfolio(ArrayList<Meme> MarketMemeList) {
+		this.MemeList = new ArrayList<FolioNode>(); 
+		
+		Iterator<Meme> iter = MarketMemeList.iterator();
+		while (iter.hasNext()) {
+			this.MemeList.add( new FolioNode(iter.next()) );
+		}
 	}
 	
 	//process an order
 	public void proccessOrder(Order o) {
 		Meme currentMeme = o.m;
-		FolioNode currentfolioNode = MemeList.search(currentMeme);		
+		FolioNode currentfolioNode = search(currentMeme);		
 		//update number of memes owned
 		currentfolioNode.owned+=o.Amount;
 		//update interest
@@ -85,8 +66,9 @@ public class Portfolio {
 	}
 	
 	public void DevAdd(Meme m, int amount) {
-		FolioNode target = MemeList.search(m);
+		FolioNode target = search(m);
 		target.owned += amount;
+		value += m.Price * amount;
 	}
 
 }
