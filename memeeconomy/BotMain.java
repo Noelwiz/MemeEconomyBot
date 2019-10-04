@@ -30,10 +30,12 @@ public class BotMain extends ListenerAdapter{
 		try {
 			api = new JDABuilder(AccountType.BOT).setToken(botToken).buildBlocking();
 			api.getPresence().setGame(Game.of(Game.GameType.DEFAULT, "Meme-onomics"));
-			api.addEventListener(new MemeEconomyCommands());
+			api.addEventListener(new MemeEconomyCommandInterpreter());
 		} catch (LoginException | IllegalArgumentException | InterruptedException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Failed to connect to the api.");
 			e.printStackTrace();
-		}	
+		}
+		
+		System.out.println("Exiting bot");
 	}
 }

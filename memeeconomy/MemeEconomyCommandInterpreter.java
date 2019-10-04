@@ -17,102 +17,49 @@ import net.dv8tion.jda.core.entities.MessageEmbed.Field;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class MemeEconomyCommands extends net.dv8tion.jda.core.hooks.ListenerAdapter {
-	public static String trigger = "$";
-	public static HashMap<Guild,Market> marketdict = new HashMap<Guild,Market>(6);
+public class MemeEconomyCommandInterpreter extends net.dv8tion.jda.core.hooks.ListenerAdapter {
+	private static String trigger = "$";
+	private CommandsHandler handler = new CommandsHandler();
+	
 	
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		
+	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {	
 		//every time a message is sent from a server, an event will be receved here
 		Message incommingMessage = event.getMessage();
-		String command[] = incommingMessage.getContentDisplay().split(" ");
-		System.out.println(incommingMessage.getContentDisplay());
+		String command = incommingMessage.toString().split(" ")[0];
 		
-		User person = incommingMessage.getAuthor();
-		
-		//checking for trigger symbol
-		if(!command[0].startsWith(trigger)) {
+		if(command.startsWith(trigger)) {
 			//return now if not present
 			return;
 		}	
-
-		//for use in side the switch
-		Meme m;
 		
-		System.out.println(command[0]);
+		System.out.println(command);		
 		
-		Market currentMarket;
-		if(marketdict.containsKey(incommingMessage.getGuild())) {
-			currentMarket = marketdict.get(incommingMessage.getGuild());
-		} else {
-			currentMarket = new Market();
-			marketdict.put(incommingMessage.getGuild(), currentMarket);
-		}
+		//cut out the trigger character(s) to make the following more readable
+		command = command.substring(trigger.length());
 		
-		command[0] = command[0].substring(trigger.length());
-		
-		switch(command[0].toLowerCase()) {
+		switch(command.toLowerCase()) {
+			//set this up
 			case"initialize":
-				//set this up
-				incommingMessage.getChannel().sendMessage("Welcome traders to the newest and best cryptocurrency, **MEMES**! \nIn order to view the commands, type $help all commands are not case sensitive, and are triggered by the $ sign because this is a serious meme economy!").queue();
-				//add this server to the market dictionary
-				//marketdict.search(incommingMessage.getGuild());
+				handler.Initalize(incommingMessage.getGuild(),incommingMessage);
 				break;
-			
+			//start the trading round					
 			case "startround":
-				//start the trading round
-				if (currentMarket.startRound()) {
-					incommingMessage.getChannel().sendMessage("A new round of trading has been started\ntype $join to join this round of trading").queue();
-					EmbedBuilder eb = marketEmbed(currentMarket);				
-					//send embed
-					incommingMessage.getChannel().sendMessage(eb.build()).queue();
-					incommingMessage.getChannel().sendMessage(currentMarket.LeaderBoardToPrint()).queue();
-				}
-				else {
-					incommingMessage.getChannel().sendMessage("Error: Round already in progress?").queue();				
-				}
+				handler.StartRound(incommingMessage.getGuild(), incommingMessage.getChannel());
 				break;
-				
-			case "getprices":
-				//tell people what the prices are on command
-				EmbedBuilder eb = marketEmbed(currentMarket);				
-				//send embed
-				incommingMessage.getChannel().sendMessage(eb.build()).queue();
-				break;
-				
+			//end round of trading
 			case "endround":
-				//end the trading round
-				if(currentMarket.endRound()) {
-					incommingMessage.getChannel().sendMessage("Round ended, proccessing orders").queue();
-					incommingMessage.getChannel().sendMessage(currentMarket.LeaderBoardToPrint()).queue();
-				}
-				else {
-					incommingMessage.getChannel().sendMessage("Problem: No Round Started").queue();				
-					if (currentMarket.startRound()) {
-						incommingMessage.getChannel().sendMessage("Starting a new round\ntype $join to join this round of trading").queue();
-						eb = marketEmbed(currentMarket);				
-						//send embed
-						incommingMessage.getChannel().sendMessage(eb.build()).queue();
-						incommingMessage.getChannel().sendMessage(currentMarket.LeaderBoardToPrint()).queue();
-					}
-					else {
-						incommingMessage.getChannel().sendMessage("Type $StartRound to start a round, failed to automatically do so").queue();	
-					}
-				}
+				handler.EndRound(incommingMessage.getGuild(), incommingMessage.getChannel());
 				break;	
-				
+			//join this round of trading	
 			case "join":
-				//join this round of trading, so people don't passively gain money forever
-				//alternativly creates a new addition to the player dictionary in the market class if they have not traded before
-				if (currentMarket.join(incommingMessage.getAuthor())) {
-					incommingMessage.getChannel().sendMessage("you joined this round of trading").queue();
-				}
-				else {
-					incommingMessage.getChannel().sendMessage("failed to join").queue();
-				}
+				handler.JoinRound(incommingMessage.getGuild(),incommingMessage);
 				break;
-				
+			//get prices of memes
+			case "getprices":
+					handler.GetPrices(incommingMessage.getGuild(), incommingMessage.getChannel());
+					break;
+			//see your meme portfolio
 			case"portfolio":
 				//only send the persons portfolio who did the command
 				currentMarket.PlayerDict.get(incommingMessage.getAuthor().getId()).pmPortfolio();
@@ -461,25 +408,6 @@ public class MemeEconomyCommands extends net.dv8tion.jda.core.hooks.ListenerAdap
 				break;
 		}
 
-	}
-	
-	private EmbedBuilder marketEmbed(Market m) {
-		EmbedBuilder eb = new EmbedBuilder();
-		eb.setColor(Color.ORANGE);
-		eb.setTitle("Current Market");
-		eb.addField("Round",Integer.toString( m.round), false);
-		String tags = "tags: ";
-		
-		Meme current;
-		
-		for(int i=0;i<m.MemeList.size();i++) {
-			current = m.MemeList.get(i);
-			eb.addField(current.Name, "Current Price:"+current.Price+"\nDividend: "+current.dividend, true);
-			tags+=(", "+current.Tag);
-		}
-		
-		eb.addField("Stock Tags",tags, false);
-		return eb;
 	}
 
 }
