@@ -3,7 +3,7 @@ package economy;
 import java.awt.Color;
 import java.util.Random;
 
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class Meme {
 	public String Tag;

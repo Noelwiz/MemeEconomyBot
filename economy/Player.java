@@ -8,10 +8,10 @@ import java.util.Queue;
 import java.util.Random;
 
 import economy.Portfolio.FolioNode;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Channel;
-import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class Player {
 	String id;
@@ -52,7 +52,7 @@ public class Player {
 		
 		System.out.println("created player, now pming portfolio");
 		System.out.println(folio.toString());
-		pmPortfolio();
+		//pmPortfolio(); //TODO: GIVE USERS inital portfolios
 		
 	}
 	
@@ -77,15 +77,9 @@ public class Player {
 			//update net worth
 			calculateNetWorth();
 			//pm the player their stuff as an embed
-			pmPortfolio();
+			//pmPortfolio(); //TODO: GIVE USERS updated portfiolios
 		}
 	
-	public void pmPortfolio() {
-		thisuser.openPrivateChannel().queue((channel) ->
-        {
-            channel.sendMessage(PortfolioEmbed().build()).queue();
-        });
-	}
 	
 	//adds the order from a trade offer to this player
 	public void queueTradeOrder(Order o) {
@@ -111,23 +105,6 @@ public class Player {
 		else return false;
 	}
 	
-	public boolean buyMeme(Meme m) {
-		//check if player has enough money
-		//   money, more negative than total cost of everything
-		//so mathy, multiply by -1, swap the < to a > so if money > total cost 
-		if((-1*Money) < (totalcost +(-1*m.Price))) {
-			//if so add to order queue 
-			Order o = new Order(m, 1);
-			
-			orders.add(o);
-			
-			//return if it was succsesfull.	
-			totalcost -= (m.Price);
-			return true;
-		}
-		else return false;
-	}
-	
 	public boolean sellMeme(Meme m,int num) {
 		//check if player has enough of that meme
 		if(num > 0 && folio.search(m).owned>=num) {
@@ -135,21 +112,6 @@ public class Player {
 			Order o = new Order(m,-1*num);
 			orders.add(o);
 			totalcost += o.MoneyChange;
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	
-	public boolean sellMeme(Meme m) {
-		//check if player has enough of that meme
-		if(folio.search(m).owned>= 1) {
-			//if so add to order queue
-			Order o = new Order(m,-1);
-			orders.add(o);
-			totalcost += o.MoneyChange;
-
 			return true;
 		}
 		else {
@@ -203,18 +165,20 @@ public class Player {
 		return (int) this.totalcost;
 	}
 	
-	public EmbedBuilder PortfolioEmbed() {
+	
+	/*TODO: take this off the player class */
+	public static EmbedBuilder PortfolioEmbed(Player player) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(Color.YELLOW);
-		eb.setTitle(thisuser.getName());
+		eb.setTitle(player.thisuser.getName());
 		//get basic stats
-		eb.addField("Interest","$"+folio.InterestPerRound, false);
-		eb.addField("Portfolio value","$"+folio.value, false);
-		eb.addField("Net Worth","$"+NetWorth, false);
-		eb.addField("Money","$"+Money, false);
+		eb.addField("Interest","$"+player.folio.InterestPerRound, false);
+		eb.addField("Portfolio value","$"+player.folio.value, false);
+		eb.addField("Net Worth","$"+player.NetWorth, false);
+		eb.addField("Money","$"+player.Money, false);
 		//GO THROUGH meme by meme
 		
-		Iterator<FolioNode> folioitter = folio.MemeList.iterator();
+		Iterator<FolioNode> folioitter = player.folio.MemeList.iterator();
 		
 		FolioNode current;
 		while (folioitter.hasNext()) {
