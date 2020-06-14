@@ -2,15 +2,15 @@
 A Discord Based Stock Market Simulation game.<br>
 
 # Demos
-![An Image of a New Round of Meme Trading](https://cdn.discordapp.com/attachments/407351922828378116/721611060137951282/unknown.png)
+![An Image of a New Round of Meme Trading](https://cdn.discordapp.com/attachments/407351922828378116/721611060137951282/unknown.png) <br>
 The bot works on a round system. Every round, people can buy and sell stocks, in this case memes, and at the end of the round, 
 prices will change, and players will get dividends from their stocks. The motivation behind the round based system
 is that I don't think it would be fun for players to passively earn tons of money while theyre gone 
 if the bot has been very active. Returning 50 rounds later to a bunch of money is not fun, unless there was 
 enough depth like [Cookie Clicker](https://en.wikipedia.org/wiki/Cookie_Clicker) has.<br>
-![Image of A Meme Portfolio](https://media.discordapp.net/attachments/407351922828378116/721609844980842516/unknown.png) 
+![Image of A Meme Portfolio](https://media.discordapp.net/attachments/407351922828378116/721609844980842516/unknown.png) <br>
 The bot messages every player in the round a summary of their portfolio at the end of every round.<br>
-![Buying A Meme](https://cdn.discordapp.com/attachments/407351922828378116/721610575334998036/unknown.png)
+![Buying A Meme](https://cdn.discordapp.com/attachments/407351922828378116/721610575334998036/unknown.png)<br>
 A short tag is used to buy stocks because spaces are used to separate command arguments. People can buy and sell stocks at any
 point during a round they have entered. 
 
