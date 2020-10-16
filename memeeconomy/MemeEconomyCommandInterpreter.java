@@ -1,24 +1,20 @@
 package me.noelwiz.bots.memeeconomy;
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
-import economy.Market;
-import economy.Meme;
-import economy.Player;
-import economy.TradeOffer;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
+import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+/***
+ * Takes in the discord api events and sends them to the handler
+ * 
+ * Basically the controller part of modle view controller 
+ * @author dppet
+ *
+ */
 public class MemeEconomyCommandInterpreter extends ListenerAdapter {
 	private static String trigger = "$";
 	private CommandsHandler handler = new CommandsHandler();
@@ -28,12 +24,14 @@ public class MemeEconomyCommandInterpreter extends ListenerAdapter {
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {	
 		//every time a message is sent from a server, an event will be receved here
 		Message incommingMessage = event.getMessage();
-	
-		String[] arguments = incommingMessage.toString().split(" ");
+		
+		String[] arguments = incommingMessage.getContentDisplay().split(" ");
 		String command = arguments[0];
 		
-		if(command.startsWith(trigger)) {
+		
+		if(! command.startsWith(trigger)) {
 			//return now if not present
+			System.out.println("hey, no trigger");
 			return;
 		}	
 		
@@ -124,7 +122,7 @@ public class MemeEconomyCommandInterpreter extends ListenerAdapter {
 				if (arguments.length<=2) {
 					handler.ErrorNotEnoughArgsResponse(incommingMessage.getChannel());
 				}else if(true) {
-					int amount = 0;
+					int amount = 0; //TODO: FIGURE OUT WHY THIS IS HERE BECAUSE IT SHOULDN'T BE SO SOMETHING ELSE IS PROBABLY BROKEN
 					try {
 						amount = Integer.parseInt(arguments[2]);
 					}

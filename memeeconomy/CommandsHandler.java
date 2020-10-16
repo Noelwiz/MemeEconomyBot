@@ -5,25 +5,23 @@ package me.noelwiz.bots.memeeconomy;
 
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import economy.Market;
 import economy.Meme;
 import economy.Player;
 import economy.TradeOffer;
-import economy.Portfolio.FolioNode;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
  * @author dppet
+ * 
+ * bridges from discord over to the meme economy
+ * 
+ * basically the view part of Modle View Controller
  *
  */
 class CommandsHandler {
@@ -36,7 +34,6 @@ class CommandsHandler {
 	
 	
 	
-	@SuppressWarnings("unused")
 	void Initalize(Guild g, Message m){
 		if(MarketInitalized(g)) {
 			m.getChannel().sendMessage("This market has already been initalized, congratualations!.").queue();
@@ -141,7 +138,7 @@ class CommandsHandler {
 		//tag maybe null
 		Meme m =  marketdict.get(g).MarketSearch(tag);
 		if (m!=null) {
-			EmbedBuilder em = m.memeEmbed();
+			EmbedBuilder em = Meme.memeEmbed(m);
 			c.sendMessage(em.build()).queue();
 		} 
 		else {
